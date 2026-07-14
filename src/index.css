@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --cream: #f9ddbc;
+    --iron: #160b03;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    scroll-behavior: auto; /* Lenis owns scrolling */
+  }
+
+  /* keep anchored section titles clear of the sticky navbar */
+  section[id] {
+    scroll-margin-top: 6rem;
+  }
+
+  body {
+    @apply bg-iron-950 text-cream font-sans;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: #e88504;
+    color: #160b03;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #160b03;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(#d24e01, #ec9006);
+    border-radius: 999px;
+  }
+}
+
+@layer components {
+  /* Grain / noise overlay */
+  .noise::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .glass {
+    background: rgba(46, 26, 11, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(245, 199, 126, 0.14);
+  }
+
+  .glass-cream {
+    background: rgba(249, 221, 188, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(210, 78, 1, 0.14);
+  }
+
+  .text-molten {
+    background: linear-gradient(120deg, #d24e01, #e88504 45%, #f1b04c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* eyebrow label */
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.28em] text-ember-500;
+  }
+
+  /* standard surface card — the Rocketseat-grade building block */
+  .card {
+    @apply rounded-2xl border border-cream/[0.07] bg-iron-900/40 transition-all duration-300;
+  }
+  .card-hover:hover {
+    @apply -translate-y-1 border-ember-500/35 bg-iron-900/70;
+  }
+}
+
+@layer utilities {
+  .container-forge {
+    @apply mx-auto w-full max-w-7xl px-6 md:px-10;
+  }
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent);
+    mask-image: linear-gradient(to bottom, black 60%, transparent);
+  }
+  /* Landing section bands — alternating tones for visual rhythm (all dark
+     enough to keep cream text readable). */
+  .band-dark {
+    background: #160b03; /* iron-950 */
+  }
+  .band-warm {
+    background: linear-gradient(180deg, #1f1207 0%, #160b03 100%);
+  }
+  .band-char {
+    background: #1c1108; /* warm charcoal, visibly lighter than 950 */
+  }
+  .band-ember {
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(210, 78, 1, 0.18), transparent 55%),
+      linear-gradient(180deg, #1a0d05 0%, #160b03 100%);
+  }
+  .band-glow {
+    position: relative;
+    background: #160b03;
+  }
+
+  /* soft floating light for section ambience */
+  .blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* thin gradient divider between bands */
+  .band-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(232, 133, 4, 0.35),
+      transparent
+    );
+  }
+
+  /* gradient border card — premium ember edge over a dark glass surface */
+  /* Clean, solid surface with a hairline border — no glassy glow. */
+  .grad-border {
+    position: relative;
+    background: #17100b;
+    border: 1px solid rgba(245, 199, 126, 0.09);
+    border-radius: 1rem;
+  }
+
+  .bg-dots {
+    background-image: radial-gradient(
+      rgba(245, 199, 126, 0.09) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+  }
+  .bg-grid {
+    background-image: linear-gradient(
+        rgba(245, 199, 126, 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(245, 199, 126, 0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 12%,
+      black 88%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 12%,
+      black 88%,
+      transparent
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

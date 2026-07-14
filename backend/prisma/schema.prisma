@@ -1,0 +1,386 @@
+// Forja LMS — modelagem de dados completa
+// Dev: SQLite (zero setup). Produção: troque provider para "postgresql" e a
+// DATABASE_URL — o schema é portável (enums viram String validado no Zod).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Valores válidos dos "enums" (validados na API via Zod):
+// Role:               STUDENT | INSTRUCTOR | ADMIN
+// CourseLevel:        BEGINNER | INTERMEDIATE | ADVANCED
+// CourseStatus:       DRAFT | PUBLISHED | ARCHIVED
+// LessonType:         VIDEO | TEXT | QUIZ | DOWNLOAD
+// EnrollmentStatus:   ACTIVE | COMPLETED | CANCELLED
+// SubscriptionStatus: ACTIVE | PAST_DUE | CANCELLED | EXPIRED
+// PlanInterval:       FREE | MONTHLY | YEARLY | LIFETIME
+// EventKind:          LIVE | WORKSHOP | WEBINAR
+// TaskStatus:         BACKLOG | IN_PROGRESS | REVIEW | DONE
+// TaskPriority:       LOW | MEDIUM | HIGH | URGENT
+
+// ----------------------------------------------------------------------------
+// Users & Auth
+// ----------------------------------------------------------------------------
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String?
+  avatarUrl     String?
+  bio           String?
+  role          String   @default("STUDENT")
+  plan          String   @default("FREE") // FREE | PRO
+  emailVerified Boolean  @default(false)
+  isBlocked     Boolean  @default(false)
+  googleId      String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+  coursesTaught Course[]         @relation("InstructorCourses")
+  enrollments   Enrollment[]
+  progress      LessonProgress[]
+  certificates  Certificate[]
+  reviews       Review[]
+  comments      Comment[]
+  favorites     Favorite[]
+  subscriptions Subscription[]
+  notifications Notification[]
+  tasksAssigned Task[]           @relation("TaskAssignee")
+  tasksCreated  Task[]           @relation("TaskAuthor")
+  eventsHosted  Event[]          @relation("EventHost")
+  studyLogs     StudyLog[]
+
+  @@index([role])
+}
+
+// Per-day accumulated watch time (seconds): powers hours studied, weekly rhythm & streak.
+model StudyLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String // yyyy-mm-dd
+  seconds   Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  type      String // EMAIL_VERIFY | PASSWORD_RESET
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+// ----------------------------------------------------------------------------
+// Catalog: Course > Module > Section > Lesson
+// ----------------------------------------------------------------------------
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  icon      String?
+  courses   Course[]
+  createdAt DateTime @default(now())
+}
+
+model Course {
+  id            String  @id @default(cuid())
+  title         String
+  slug          String  @unique
+  subtitle      String?
+  description   String?
+  thumbnailUrl  String?
+  level         String  @default("BEGINNER")
+  status        String  @default("DRAFT")
+  price         Int     @default(0) // cents; 0 = free
+  isFree        Boolean @default(false)
+  durationMin   Int     @default(0)
+  ratingAvg     Float   @default(0)
+  ratingCount   Int     @default(0)
+  studentsCount Int     @default(0)
+  tags          String? // JSON string, e.g. ["react","ts"]
+  outcomes      String? // JSON string — o que o aluno aprende (p/ certificado)
+
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+  instructorId String
+  instructor   User      @relation("InstructorCourses", fields: [instructorId], references: [id])
+
+  modules      Module[]
+  enrollments  Enrollment[]
+  reviews      Review[]
+  favorites    Favorite[]
+  certificates Certificate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([instructorId])
+}
+
+model Module {
+  id        String    @id @default(cuid())
+  title     String
+  order     Int       @default(0)
+  courseId  String
+  course    Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sections  Section[]
+  createdAt DateTime  @default(now())
+
+  @@index([courseId])
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int      @default(0)
+  moduleId  String
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+  createdAt DateTime @default(now())
+
+  @@index([moduleId])
+}
+
+model Lesson {
+  id          String  @id @default(cuid())
+  title       String
+  type        String  @default("VIDEO")
+  order       Int     @default(0)
+  durationSec Int     @default(0)
+  isPreview   Boolean @default(false)
+  content     String?
+
+  sectionId String
+  section   Section          @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  video     Video?
+  materials Material[]
+  progress  LessonProgress[]
+  comments  Comment[]
+
+  createdAt DateTime @default(now())
+
+  @@index([sectionId])
+}
+
+model Video {
+  id          String  @id @default(cuid())
+  url         String
+  provider    String  @default("upload") // upload | youtube | vimeo
+  durationSec Int     @default(0)
+  captionsUrl String?
+  lessonId    String  @unique
+  lesson      Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model Material {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  sizeBytes Int      @default(0)
+  kind      String   @default("pdf") // pdf | zip | image | link
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([lessonId])
+}
+
+// ----------------------------------------------------------------------------
+// Learning
+// ----------------------------------------------------------------------------
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status      String    @default("ACTIVE")
+  progressPct Float     @default(0)
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@unique([userId, courseId])
+  @@index([userId])
+}
+
+model LessonProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId   String
+  lesson     Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed  Boolean  @default(false)
+  lastSecond Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+}
+
+model Certificate {
+  id       String   @id @default(cuid())
+  code     String   @unique
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  pdfUrl   String?
+  issuedAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      @default(5)
+  comment   String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  body      String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId  String
+  lesson    Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
+
+  @@index([lessonId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+// ----------------------------------------------------------------------------
+// Billing
+// ----------------------------------------------------------------------------
+
+model Plan {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  priceCents    Int            @default(0)
+  interval      String         @default("FREE")
+  features      String? // JSON string
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now())
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId    String
+  plan      Plan      @relation(fields: [planId], references: [id])
+  status    String    @default("ACTIVE")
+  startedAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([userId])
+}
+
+// ----------------------------------------------------------------------------
+// Engagement
+// ----------------------------------------------------------------------------
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String?
+  href      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  kind        String    @default("LIVE")
+  startsAt    DateTime
+  endsAt      DateTime?
+  url         String?
+  hostId      String
+  host        User      @relation("EventHost", fields: [hostId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@index([startsAt])
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  status      String    @default("BACKLOG")
+  priority    String    @default("MEDIUM")
+  order       Int       @default(0)
+  dueDate     DateTime?
+  submission  String? // link enviado pelo aluno (GitHub/Figma/etc)
+  assigneeId  String?
+  assignee    User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  authorId    String
+  author      User      @relation("TaskAuthor", fields: [authorId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+}

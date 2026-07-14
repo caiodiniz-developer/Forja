@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# builds
+dist/
+**/dist/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.*
+!.env.example
+**/.env
+!**/.env.example
+
+# backend runtime data (NEVER commit)
+backend/uploads/
+backend/*.db
+backend/*.db-journal
+backend/dev.db
+
+# prisma generated client
+**/.prisma/
+
+# logs & misc
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vite/
+coverage/
+
+# editor
+.vscode/
+.idea/
