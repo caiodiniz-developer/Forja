@@ -1,4 +1,5 @@
 import { FiGithub, FiInstagram, FiYoutube, FiLinkedin } from "react-icons/fi";
+import { LogoMark } from "@/components/common/Logo";
 
 const columns = [
   {
@@ -31,9 +32,7 @@ export function Footer() {
         <div className="grid gap-12 pb-16 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <a href="#topo" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-molten font-display text-lg font-bold text-iron-950">
-                F
-              </span>
+              <LogoMark className="h-10 w-10" />
               <span className="font-display text-xl font-semibold text-cream">
                 Forja
               </span>

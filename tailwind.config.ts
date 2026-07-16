@@ -16,14 +16,19 @@ export default {
           300: "#f1b04c",
           200: "#f5c77e",
         },
-        cream: "#f9ddbc",
-        // Warm charcoal — the "cold iron" of the forge (derived, not a brand hue).
+        // Foreground: a warm near-white. Beige text on brown read as sepia/muddy
+        // and killed contrast — this keeps the warmth but lets copy stay crisp.
+        cream: "#f5f3f1",
+        // Sand: the original brand beige, kept for warm accents only (not text).
+        sand: "#f9ddbc",
+        // Surfaces: near-neutral charcoal with only a whisper of warmth, so the
+        // ember accents actually pop instead of drowning in brown.
         iron: {
-          950: "#160b03",
-          900: "#1f1207",
-          850: "#241408",
-          800: "#2e1a0b",
-          700: "#3d2410",
+          950: "#0b0a09",
+          900: "#131211",
+          850: "#181716",
+          800: "#211f1d",
+          700: "#2d2a27",
         },
       },
       fontFamily: {

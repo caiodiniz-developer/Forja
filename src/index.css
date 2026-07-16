@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --cream: #f9ddbc;
-    --iron: #160b03;
+    --cream: #f5f3f1;
+    --iron: #0b0a09;
   }
 
   * {
@@ -29,19 +29,25 @@
 
   ::selection {
     background: #e88504;
-    color: #160b03;
+    color: #0b0a09;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar — subtle, not a glowing orange bar down the page */
   ::-webkit-scrollbar {
     width: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #160b03;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(#d24e01, #ec9006);
+    background: rgba(245, 243, 241, 0.12);
+    border: 3px solid transparent;
+    background-clip: content-box;
     border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 243, 241, 0.22);
+    background-clip: content-box;
   }
 }
 
@@ -58,10 +64,10 @@
   }
 
   .glass {
-    background: rgba(46, 26, 11, 0.45);
+    background: rgba(19, 18, 17, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(245, 199, 126, 0.14);
+    border: 1px solid rgba(245, 243, 241, 0.1);
   }
 
   .glass-cream {
@@ -103,22 +109,22 @@
   /* Landing section bands — alternating tones for visual rhythm (all dark
      enough to keep cream text readable). */
   .band-dark {
-    background: #160b03; /* iron-950 */
+    background: #0b0a09; /* iron-950 */
   }
   .band-warm {
-    background: linear-gradient(180deg, #1f1207 0%, #160b03 100%);
+    background: linear-gradient(180deg, #131211 0%, #0b0a09 100%);
   }
   .band-char {
-    background: #1c1108; /* warm charcoal, visibly lighter than 950 */
+    background: #141312; /* a step lighter than the base */
   }
   .band-ember {
     background:
-      radial-gradient(120% 90% at 50% 0%, rgba(210, 78, 1, 0.18), transparent 55%),
-      linear-gradient(180deg, #1a0d05 0%, #160b03 100%);
+      radial-gradient(120% 90% at 50% 0%, rgba(210, 78, 1, 0.14), transparent 55%),
+      linear-gradient(180deg, #100e0d 0%, #0b0a09 100%);
   }
   .band-glow {
     position: relative;
-    background: #160b03;
+    background: #0b0a09;
   }
 
   /* soft floating light for section ambience */
@@ -145,8 +151,8 @@
   /* Clean, solid surface with a hairline border — no glassy glow. */
   .grad-border {
     position: relative;
-    background: #17100b;
-    border: 1px solid rgba(245, 199, 126, 0.09);
+    background: #131211;
+    border: 1px solid rgba(245, 243, 241, 0.08);
     border-radius: 1rem;
   }
 

@@ -92,7 +92,7 @@ export function AreaChart({
             x2={w - PAD.right}
             y1={gy}
             y2={gy}
-            stroke="rgba(245,199,126,0.08)"
+            stroke="rgba(245,243,241,0.07)"
             strokeWidth={1}
           />
         ))}
@@ -119,19 +119,25 @@ export function AreaChart({
           transition={{ duration: 1.3, ease: "easeInOut" }}
         />
 
-        {/* x labels */}
-        {data.map((d, i) => (
-          <text
-            key={i}
-            x={x(i)}
-            y={height - 6}
-            textAnchor="middle"
-            className="fill-cream/40 font-mono"
-            style={{ fontSize: 10 }}
-          >
-            {d.label}
-          </text>
-        ))}
+        {/* x labels — thinned out so they never collide */}
+        {data.map((d, i) => {
+          const maxLabels = Math.max(2, Math.floor(w / 70));
+          const step = Math.ceil(data.length / maxLabels);
+          const show = i % step === 0 || i === data.length - 1;
+          if (!show) return null;
+          return (
+            <text
+              key={i}
+              x={x(i)}
+              y={height - 6}
+              textAnchor="middle"
+              className="fill-cream/35 font-mono"
+              style={{ fontSize: 10 }}
+            >
+              {d.label}
+            </text>
+          );
+        })}
 
         {/* hover crosshair + marker */}
         {hover !== null && (
@@ -141,7 +147,7 @@ export function AreaChart({
               x2={x(hover)}
               y1={PAD.top}
               y2={PAD.top + innerH}
-              stroke="rgba(245,199,126,0.35)"
+              stroke="rgba(245,243,241,0.25)"
               strokeWidth={1}
               strokeDasharray="3 3"
             />
@@ -149,7 +155,7 @@ export function AreaChart({
               cx={x(hover)}
               cy={y(data[hover].value)}
               r={5}
-              fill="#160b03"
+              fill="#0b0a09"
               stroke="#f1b04c"
               strokeWidth={2.5}
             />

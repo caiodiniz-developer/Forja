@@ -51,15 +51,14 @@ export function Hero() {
     >
       {/* ---------- layered background stack ---------- */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* 1. background video (drop your file at /public/hero.mp4) */}
+        {/* 1. background video (/public/hero.mp4) */}
         <video
-          className="absolute inset-0 h-full w-full object-cover opacity-25"
+          className="absolute inset-0 h-full w-full object-cover opacity-45"
           autoPlay
           muted
           loop
           playsInline
           preload="metadata"
-          poster="/hero-poster.jpg"
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
@@ -67,8 +66,8 @@ export function Hero() {
         {/* 2. animated molten gradient (also the graceful fallback with no video) */}
         <div className="absolute inset-0 animate-gradient-pan bg-[length:220%_220%] bg-gradient-to-br from-ember-900/25 via-transparent to-ember-700/15" />
 
-        {/* 3. subdued 3D forge ambience */}
-        <div className="absolute inset-0 opacity-60">
+        {/* 3. subdued 3D forge ambience (kept light so the video reads) */}
+        <div className="absolute inset-0 opacity-30">
           <Suspense
             fallback={
               <div className="absolute inset-0 flex items-center justify-center">

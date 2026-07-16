@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
+import { LogoMark, LogoFull } from "@/components/common/Logo";
 
 interface AuthLayoutProps {
   title: string;
@@ -31,13 +32,8 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
         <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-ember-500/60 to-transparent" />
 
         <div className="relative flex h-full flex-col justify-between p-12 xl:p-16">
-          <Link to="/" className="flex w-fit items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-molten font-display text-lg font-bold text-iron-950">
-              F
-            </span>
-            <span className="font-display text-xl font-semibold text-cream">
-              Forja
-            </span>
+          <Link to="/" className="w-fit">
+            <LogoFull className="w-36 transition-transform hover:scale-105" />
           </Link>
 
           <div className="max-w-md">
@@ -79,9 +75,7 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
 
         <div className="w-full max-w-sm">
           <Link to="/" className="mb-10 flex w-fit items-center gap-2.5 lg:hidden">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-molten font-display text-lg font-bold text-iron-950">
-              F
-            </span>
+            <LogoMark className="h-9 w-9" />
             <span className="font-display text-xl font-semibold text-cream">Forja</span>
           </Link>
 

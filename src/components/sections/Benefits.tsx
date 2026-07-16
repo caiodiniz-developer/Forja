@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiPlay, FiCheck, FiArrowRight } from "react-icons/fi";
 import { SectionHeading } from "@/components/common/SectionHeading";
+import { LogoMark } from "@/components/common/Logo";
 
 interface Feature {
   tag: string;
@@ -86,9 +87,7 @@ function Visual({ index }: { index: number }) {
       return (
         <div className="flex h-full items-center justify-center rounded-2xl bg-gradient-to-br from-iron-800 to-iron-950 p-6">
           <div className="w-full max-w-xs rounded-xl border-2 border-ember-500/40 bg-iron-950/60 p-5 text-center">
-            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-molten font-display text-lg font-bold text-iron-950">
-              F
-            </div>
+            <LogoMark className="mx-auto mb-3 h-10 w-10" />
             <p className="font-mono text-[0.6rem] uppercase tracking-[0.3em] text-ember-400">
               Certificado
             </p>

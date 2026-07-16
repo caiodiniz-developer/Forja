@@ -3,6 +3,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
+import { LogoMark } from "@/components/common/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -41,12 +42,7 @@ export function Navbar() {
           )}
         >
           <a href="#topo" className="group flex items-center gap-2.5">
-            <span className="relative flex h-9 w-9 items-center justify-center">
-              <span className="absolute inset-0 rounded-lg bg-molten opacity-90 blur-[2px] transition-opacity group-hover:opacity-100" />
-              <span className="relative font-display text-lg font-bold text-iron-950">
-                F
-              </span>
-            </span>
+            <LogoMark className="h-9 w-9 transition-transform group-hover:scale-105" />
             <span className="font-display text-xl font-semibold tracking-tight text-cream">
               Forja
             </span>

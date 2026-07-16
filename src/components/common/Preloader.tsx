@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@/hooks/useGSAP";
+import { LogoMark } from "@/components/common/Logo";
 
 /** Full-screen intro: the forge mark ignites, a molten bar fills, then it lifts to reveal the page. */
 export function Preloader() {
@@ -55,11 +56,8 @@ export function Preloader() {
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-molten opacity-20 blur-[100px]" />
 
       <div className="relative flex flex-col items-center">
-        <div
-          data-pre-mark
-          className="flex h-16 w-16 items-center justify-center rounded-2xl bg-molten shadow-glow"
-        >
-          <span className="font-display text-3xl font-bold text-iron-950">F</span>
+        <div data-pre-mark>
+          <LogoMark className="h-20 w-20" />
         </div>
 
         <div data-pre-word className="mt-6 overflow-hidden">

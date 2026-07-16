@@ -8,6 +8,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { useAuth } from "@/hooks/useAuth";
+import { LogoMark } from "@/components/common/Logo";
 import { API_BASE } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -28,9 +29,7 @@ export interface NavGroup {
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
     <div className="flex h-8 items-center gap-2.5 px-1">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-molten font-display text-lg font-bold text-iron-950">
-        F
-      </span>
+      <LogoMark className="h-9 w-9 shrink-0" />
       {!collapsed && (
         <span className="font-display text-xl font-semibold text-cream">
           Forja

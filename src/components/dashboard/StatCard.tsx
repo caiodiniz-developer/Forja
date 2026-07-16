@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import { motion } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
@@ -14,7 +13,10 @@ interface StatCardProps {
   delay?: number;
 }
 
-/** KPI tile: gradient-border glass, animated count-up, pointer-follow glow. */
+/**
+ * Editorial KPI tile: the number is the hero, the icon stays quiet, and a
+ * molten rule under the figure grows on hover. No glowy icon boxes.
+ */
 export function StatCard({
   label,
   value,
@@ -24,53 +26,40 @@ export function StatCard({
   trend,
   delay = 0,
 }: StatCardProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [glow, setGlow] = useState({ x: 50, y: 50, on: false });
-
-  const onMove = (e: React.MouseEvent) => {
-    const r = ref.current?.getBoundingClientRect();
-    if (!r) return;
-    setGlow({
-      x: ((e.clientX - r.left) / r.width) * 100,
-      y: ((e.clientY - r.top) / r.height) * 100,
-      on: true,
-    });
-  };
-
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 22 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-      onMouseMove={onMove}
-      onMouseLeave={() => setGlow((g) => ({ ...g, on: false }))}
-      className="grad-border group relative overflow-hidden p-5"
+      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="group relative overflow-hidden rounded-xl border border-cream/[0.08] bg-iron-900 p-5 transition-colors duration-300 hover:border-cream/[0.16]"
     >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(340px circle at ${glow.x}% ${glow.y}%, rgba(232,133,4,0.16), transparent 45%)`,
-        }}
-      />
-      <div className="relative flex items-start justify-between">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-molten-soft text-iron-950 shadow-ember">
-          <Icon size={20} />
-        </div>
-        {trend && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-ember-500/25 bg-ember-500/10 px-2.5 py-1 font-mono text-[0.65rem] text-ember-300">
-            <FiArrowUpRight size={11} />
-            {trend}
-          </span>
-        )}
+      {/* header: label + quiet icon */}
+      <div className="flex items-start justify-between gap-3">
+        <span className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-cream/40">
+          {label}
+        </span>
+        <Icon
+          size={16}
+          className="shrink-0 text-cream/25 transition-colors duration-300 group-hover:text-ember-400"
+        />
       </div>
 
-      <div className="relative mt-5">
-        <div className="font-display text-3xl font-semibold tracking-tight text-cream">
-          <AnimatedNumber value={value} prefix={prefix} suffix={suffix} />
-        </div>
-        <div className="mt-1 text-sm text-cream/50">{label}</div>
+      {/* the figure */}
+      <div className="mt-6 font-display text-[2.75rem] font-semibold leading-none tracking-tight text-cream">
+        <AnimatedNumber value={value} prefix={prefix} suffix={suffix} />
       </div>
+
+      {/* molten rule that grows on hover */}
+      <div className="mt-4 h-px w-full bg-cream/[0.08]">
+        <div className="h-px w-8 bg-molten transition-all duration-500 group-hover:w-20" />
+      </div>
+
+      {trend && (
+        <div className="mt-3 inline-flex items-center gap-1 font-mono text-[0.65rem] text-ember-400/90">
+          <FiArrowUpRight size={11} />
+          {trend}
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -13,8 +13,6 @@ export function DashboardLayout({ groups }: { groups: NavGroup[] }) {
 
   return (
     <div className="relative flex min-h-screen bg-iron-950">
-      {/* a single, quiet warm accent at the very top — no glowy blobs */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-40 bg-gradient-to-b from-ember-900/[0.06] to-transparent" />
 
       <Sidebar
         groups={groups}
