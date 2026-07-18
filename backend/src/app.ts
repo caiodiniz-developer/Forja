@@ -21,7 +21,7 @@ export function createApp() {
         if (
           !origin ||
           origin === env.CLIENT_URL ||
-          /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
+          /^https?:\/\/localhost(:\d+)?$/.test(origin) || 
           /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
         ) {
           cb(null, true);

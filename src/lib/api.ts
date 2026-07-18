@@ -1,5 +1,40 @@
-export const API_BASE =
-  import.meta.env.VITE_API_URL ?? "http://localhost:3333/api";
+function normalizeApiBase(rawValue?: string) {
+  const fallbackBase =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api`
+      : "http://localhost:3333/api";
+
+  const value = (rawValue ?? fallbackBase).trim();
+  if (!value) return fallbackBase;
+
+  const normalizedValue = value.endsWith("/") ? value.slice(0, -1) : value;
+
+  try {
+    const parsed = new URL(
+      normalizedValue,
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost",
+    );
+
+    const pathname = parsed.pathname.replace(/\/+$/, "");
+    const hasApiSegment = pathname.split("/").filter(Boolean).includes("api");
+
+    if (!pathname || pathname === "/") {
+      parsed.pathname = "/api";
+    } else if (!hasApiSegment) {
+      parsed.pathname = `${pathname}/api`;
+    }
+
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return normalizedValue.endsWith("/api")
+      ? normalizedValue.replace(/\/$/, "")
+      : `${normalizedValue.replace(/\/$/, "")}/api`;
+  }
+}
+
+export const API_BASE = normalizeApiBase(import.meta.env.VITE_API_URL);
 
 const BASE_URL = API_BASE;
 
@@ -42,10 +77,7 @@ export async function api<T = unknown>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
-  const data =
-    res.status === 204
-      ? null
-      : await res.json().catch(() => null);
+  const data = res.status === 204 ? null : await res.json().catch(() => null);
 
   if (!res.ok) throw new ApiError(res.status, data as ApiErrorBody | null);
   return data as T;
